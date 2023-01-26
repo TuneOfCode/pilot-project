@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  mysqldb:
+    image: "mysql"
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123
+    volumes:
+      - mysqldb:/var/lib/mysql
+
+  backend:
+    image: "tuneofcode/be-pilot-project:latest"
+    build: ./backend
+    ports:
+      - "2208:2208"
+    restart: always
+    environment:
+      - PORT=2208
+    volumes:
+      - ./backend:/backend
+      - /backend/node_modules
+    depends_on:
+      - mysqldb
+
+  frontend:
+    image: "tuneofcode/fe-pilot-project:latest"
+    build: ./frontend
+    ports:
+      - "1801:3000"
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+volumes:
+  mysqldb:
