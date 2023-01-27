@@ -10,6 +10,12 @@ services:
     volumes:
       - mysqldb:/var/lib/mysql
 
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    restart: always
+
   backend:
     image: "tuneofcode/be-pilot-project:latest"
     build: ./backend
@@ -21,8 +27,8 @@ services:
     volumes:
       - ./backend:/backend
       - /backend/node_modules
-    depends_on:
-      - mysqldb
+    #depends_on:
+    #  - mysqldb
 
   frontend:
     image: "tuneofcode/fe-pilot-project:latest"
