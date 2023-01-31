@@ -1,14 +1,13 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Prisma } from "@prisma/client";
+import conn from "../../app/configs/connect.db";
 
 const adminData: Prisma.AdminCreateInput[] = [
   {
-    username: "admin",
+    username: "_admin",
     password: "123",
   },
   {
-    username: "tof",
+    username: "_tof",
     password: "228",
   },
 ];
@@ -16,7 +15,7 @@ const adminData: Prisma.AdminCreateInput[] = [
 const createSeedAdmin = async () => {
   console.info(`Start seeding...`);
   for (const ad of adminData) {
-    const admin = await prisma.admin.create({
+    const admin = await conn.admin.create({
       data: ad,
     });
     console.log(`Created admin with username: ${admin.username}`);
@@ -26,10 +25,10 @@ const createSeedAdmin = async () => {
 
 createSeedAdmin()
   .then(async () => {
-    await prisma.$disconnect();
+    await conn.$disconnect();
   })
   .catch(async (err) => {
     console.error(`Seeding errored: ${err}`);
-    await prisma.$disconnect();
+    await conn.$disconnect();
     process.exit(1);
   });
