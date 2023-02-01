@@ -1,14 +1,64 @@
-import path from "path";
+import { Role } from "@prisma/client";
 import multer from "multer";
+import path from "path";
+import { DOMAIN } from "../configs/app.config";
+import { JWT } from "../constants/auth.constant";
 import {
   extensions,
   PLACE_SAVE_UPLOAD_FILE,
 } from "../constants/upload.constant";
 import BrandService from "../services/brand.service";
 import { ProductService } from "../services/product.service";
-import { removeFile } from "../utils";
-import { DOMAIN } from "../configs/app.config";
+import { decodeToken, removeFile, verifyToken } from "../utils";
 export const requestMiddleware = {
+  // middleware for request user
+  user: {
+    // middleware check fields
+    checkFields(req: any, res: any, next: any) {
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.errors(null, "Missing required fields", 400);
+      }
+      next();
+    },
+    // middleware check token
+    async checkToken(req: any, res: any, next: any) {
+      const token = req.headers["authorization"].split(" ")[1];
+      if (!token) {
+        return res.errors(null, "Missing token", 400);
+      }
+      next();
+    },
+    // middleware check token expired
+    async checkTokenExpired(req: any, res: any, next: any) {
+      const token = req.headers["authorization"].split(" ")[1];
+      const decoded: any = decodeToken(token);
+      const { exp } = decoded.payload;
+      if (exp && +exp < Date.now() / 1000) {
+        return res.errors(null, "Token expired", 401);
+      }
+      next();
+    },
+    // middleware check role
+    async checkRole(req: any, res: any, next: any) {
+      const token = req.headers["authorization"].split(" ")[1];
+      const decoded: any = verifyToken(token, JWT.SECRET_ACCESS_TOKEN);
+      const { role } = decoded;
+      if (role === Role.USER) {
+        return res.errors(null, "Must be 'SUPER ADMIN' OR 'ADMIN'", 403);
+      }
+      next();
+    },
+    // middleware check verify token
+    async checkVerifyToken(req: any, res: any, next: any) {
+      const token = req.headers["authorization"].split(" ")[1];
+      const authToken = verifyToken(token, JWT.SECRET_ACCESS_TOKEN);
+      if (!authToken) {
+        res.errors(null, "Invalid token", 401);
+      }
+      next();
+    },
+  },
   // middleware for request product
   product: {
     // middleware for request product get all

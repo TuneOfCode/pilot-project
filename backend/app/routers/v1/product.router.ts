@@ -11,6 +11,7 @@ productRouter
   .route("/")
   .get(requestMiddleware.product.getAll, productController.getListProduct)
   .post(
+    requestMiddleware.user.checkRole,
     uploadFileMiddleware.single(FIELD_NAME_UPLOAD_FILE.PRODUCT),
     requestMiddleware.product.checkFields,
     requestMiddleware.product.checkBrandId,
@@ -22,6 +23,7 @@ productRouter
   .all(requestMiddleware.product.checkProductId)
   .get(productController.getItemProduct)
   .put(
+    requestMiddleware.user.checkRole,
     uploadFileMiddleware.single(FIELD_NAME_UPLOAD_FILE.PRODUCT),
     requestMiddleware.product.checkFields,
     requestMiddleware.product.checkBrandId,
@@ -29,6 +31,7 @@ productRouter
     productController.updateProduct
   )
   .delete(
+    requestMiddleware.user.checkRole,
     requestMiddleware.product.removeOldFile,
     productController.deleteProduct
   );

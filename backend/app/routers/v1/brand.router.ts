@@ -9,6 +9,7 @@ brandRouter
   .route("/")
   .get(requestMiddleware.brand.getAll, brandController.getListBrand)
   .post(
+    requestMiddleware.user.checkRole,
     uploadFileMiddleware.single(FIELD_NAME_UPLOAD_FILE.BRAND),
     requestMiddleware.brand.checkFields,
     brandController.createBrand
@@ -19,11 +20,16 @@ brandRouter
   .all(requestMiddleware.brand.checkBrandId)
   .get(brandController.getItemBrand)
   .put(
+    requestMiddleware.user.checkRole,
     uploadFileMiddleware.single(FIELD_NAME_UPLOAD_FILE.BRAND),
     requestMiddleware.brand.checkFields,
     requestMiddleware.brand.removeOldFile,
     brandController.updateBrand
   )
-  .delete(requestMiddleware.brand.removeOldFile, brandController.deleteBrand);
+  .delete(
+    requestMiddleware.user.checkRole,
+    requestMiddleware.brand.removeOldFile,
+    brandController.deleteBrand
+  );
 
 export default brandRouter;

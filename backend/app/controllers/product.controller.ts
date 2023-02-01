@@ -5,7 +5,6 @@ import {
   IUpdateProductDTO,
 } from "../services/interfaces/product.interface";
 import { ProductService } from "../services/product.service";
-import { removeFile } from "../utils";
 
 class ProductController {
   private readonly productService: ProductService;
